@@ -25,11 +25,22 @@ analyze_growth_trends_task:
   description: Evaluate the Growth Trends CSV located at {growth_trends_csv_path}
     for the listing with ID {listing_id}. Extract population growth percentages for
     both 5-mile and 10-mile radii (e.g., % Pop Growth 2020-2024, % Pop Growth 2024-2029)
-    to assess historical and projected market expansion between these regions. In
-    addition use the WebsiteSearchTool to query things like 'economic growth in {City}
-    {State} 2025' and 'job growth in the {City} {State} region'.
-  expected_output: An in-depth analysis report of growth trends, including key metrics
-    that indicate potential market expansion opportunities.
+    to assess historical and projected market expansion between these regions. Conduct 
+    extensive web research using WebsiteSearchTool for specific companies investing
+    in {City} {State} with queries such as 'companies expanding in {City} {State}',
+    'new factories in {City} {State} 2025', 'corporate headquarters moving to {City} {State}',
+    'economic development plans {City} {State}', 'major construction projects {City} {State}',
+    'job creation {City} {State}', etc. For each company or development project found, research
+    and include specific details: company name, industry, planned investment amount, 
+    number of jobs expected, construction/opening timeline, and impact on the local economy.
+    Also research local government economic development plans and incentives that could
+    attract additional businesses to the area.
+  expected_output: A comprehensive analysis of growth trends that includes both demographic
+    projections AND specific details about companies investing in the region. Your report
+    should name individual companies, their expansion plans, job creation numbers, investment
+    amounts, timelines, and economic impacts. Include information on government economic
+    development initiatives. This detailed information should be sufficient to allow clients
+    to conduct their own follow-up research on the specific companies and projects mentioned.
   async_execution: false
   agent: growth_trends_expert
 analyze_housing_occupancy_task:
@@ -37,8 +48,11 @@ analyze_housing_occupancy_task:
     for the listing with ID {listing_id}. Investigate metrics such as TotHUs_5, OccHUs_5,
     VacHUs_5, and corresponding 10-mile metrics to determine the occupancy and vacancy
     profiles. Identify trends that might affect property usage and development potential.
+    Evaluate whether the market appears to be oversaturated with similar developments 
+    or if there is still room for growth.
   expected_output: A detailed report on current housing occupancy trends, including
-    quantified metrics on vacancies and unit usage patterns.
+    quantified metrics on vacancies and unit usage patterns, as well as analysis of 
+    market saturation for similar developments.
   async_execution: false
   agent: occupancy_expert
 analyze_demographics_affordability_task:
@@ -58,9 +72,13 @@ integrate_analysis_task:
     'analyze_growth_trends_task', 'analyze_housing_occupancy_task', and 'analyze_demographics_affordability_task'.
     Evaluate overall risk and opportunity levels for the property with ID {listing_id}.
     Develop strategic recommendations that balance market potential with identified
-    risks.
+    risks. Do not summarize or condense the detailed information - especially from the 
+    growth trends analysis. Maintain all company names, economic development plans, and 
+    specific details in your integrated report.
   expected_output: An integrated evaluation report section that provides a unified
     risk and opportunity assessment with clear strategic recommendations for the property.
+    This integration should preserve ALL detailed information from the individual analyses,
+    particularly the specific company names and development plans from the growth trends analysis.
   async_execution: false
   agent: integrated_evaluator
   context:
@@ -70,15 +88,20 @@ integrate_analysis_task:
   - analyze_housing_occupancy_task
   - analyze_demographics_affordability_task
 compile_narrative_report_task:
-  description: Compile a final high-quality narrative report in a professional land
+  description: Compile a final comprehensive narrative report in a professional land
     analyst style that integrates the findings from the integrated evaluation. The
-    report should include an executive summary, detailed sections on Property Analysis,
+    report should include an executive summary and detailed sections on Property Analysis,
     Environmental Risk, Growth Trends, Housing Occupancy, Socio-economic Factors,
-    and a concluding recommendations section. Ensure the report is polished and easily
-    digestible for decision-making purposes.
-  expected_output: A final comprehensive narrative report that consolidates all analytical
-    findings into an executive-level document with data insights, expert commentary,
-    and actionable recommendations.
+    and a concluding recommendations section. The Growth Trends section should be particularly
+    detailed, including specific company names, investment plans, job creation numbers, 
+    timelines, and economic development initiatives. Do not summarize or condense information
+    to keep the report short - include ALL details that would be valuable for further research.
+    The report should be as long as necessary to convey all findings in full detail.
+  expected_output: A comprehensive, thorough narrative report that includes ALL analytical
+    findings with complete details. The report should be a research tool that provides
+    actionable intelligence, including specific company names, economic development plans,
+    timelines, and investment details. The report should be as long as needed to include
+    all relevant information without summarizing or condensing important details.
   async_execution: false
   agent: narrative_reporter
   context:

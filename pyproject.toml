@@ -1,6 +1,6 @@
 [project]
-name = "crew_automation_evaluation_for_land_listing_opportunities"
-version = "0.1.0"
+name = "land_eval"
+version = "1.0.0"
 description = "A CrewAI workflow for evaluating land listing opportunities by analyzing property data"
 authors = [{ name = "Your Name", email = "you@example.com" }]
 requires-python = ">=3.10,<3.13"
@@ -12,12 +12,11 @@ dependencies = [
 ]
 
 [project.scripts]
-crew_automation_evaluation_for_land_listing_opportunities = "main:run"
+crew_automation = "main:run"
 run_crew = "main:run"
 train = "main:train"
 replay = "main:replay"
-test = "main:test"
-process_data = "src.crew_automation_evaluation_for_land_listing_opportunities.data_processor:main"
+process_data = "src.land_eval.data_processor:main"
 
 [build-system]
 requires = ["hatchling"]

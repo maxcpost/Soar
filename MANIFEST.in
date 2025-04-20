@@ -5,5 +5,4 @@ include .env.example
 include pyproject.toml
 include main.py
 include .gitignore
-recursive-include src/crew_automation_evaluation_for_land_listing_opportunities/config *.yaml
-recursive-include src/crew_automation_evaluation_for_land_listing_opportunities/tools *.py 
+recursive-include src/land_eval/config *.yaml 
