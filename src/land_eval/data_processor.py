@@ -217,10 +217,12 @@ def process_master_csv(stock_number, cork_path):
         # Return the city and state for later use
         city = stock_data['City'].iloc[0] if 'City' in stock_data.columns else 'Unknown'
         state = stock_data['State'].iloc[0] if 'State' in stock_data.columns else 'Unknown'
+        property_address = stock_data['Property Address'].iloc[0] if 'Property Address' in stock_data.columns else 'Unknown'
         
         return {
             'City': city,
             'State': state,
+            'Property Address': property_address,
             'listing_id': stock_number,
             'property_csv_path': str(Path("database") / "cork" / "property.csv"),
             'environmental_csv_path': str(Path("database") / "cork" / "enviornmental.csv"),

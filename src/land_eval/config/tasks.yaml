@@ -12,17 +12,27 @@ analyze_property_task:
   async_execution: false
   agent: property_analyst
 analyze_environmental_task:
-  description: Examine the Environmental CSV located at {environmental_csv_path} for
+  description: |
+    Examine the Environmental CSV located at {environmental_csv_path} for
     the listing with ID {listing_id}. Evaluate data points (In SFHA, FEMA Flood Zone,
     FEMA Map Date, Floodplain Area) to assess environmental hazards such as flood
     risk. Use the WebsiteSearchTool to better understand what the various data points
     mean.
+    
+    Show your detailed reasoning by:
+    1. Explaining what each FEMA flood zone designation means
+    2. Analyzing historical flood patterns in the area
+    3. Evaluating the impact of these flood risks on potential development
+    4. Considering how climate change might affect future flood risk
+    5. Recommending specific mitigation strategies if necessary
   expected_output: A comprehensive environmental risk analysis detailing hazard levels
-    and potential environmental challenges for the property.
+    and potential environmental challenges for the property, with clear reasoning explaining
+    how conclusions were reached.
   async_execution: false
   agent: environmental_evaluator
 analyze_growth_trends_task:
-  description: Evaluate the Growth Trends CSV located at {growth_trends_csv_path}
+  description: |
+    Evaluate the Growth Trends CSV located at {growth_trends_csv_path}
     for the listing with ID {listing_id}. Extract population growth percentages for
     both 5-mile and 10-mile radii (e.g., % Pop Growth 2020-2024, % Pop Growth 2024-2029)
     to assess historical and projected market expansion between these regions. Conduct 
@@ -30,17 +40,28 @@ analyze_growth_trends_task:
     in {City} {State} with queries such as 'companies expanding in {City} {State}',
     'new factories in {City} {State} 2025', 'corporate headquarters moving to {City} {State}',
     'economic development plans {City} {State}', 'major construction projects {City} {State}',
-    'job creation {City} {State}', etc. For each company or development project found, research
-    and include specific details: company name, industry, planned investment amount, 
-    number of jobs expected, construction/opening timeline, and impact on the local economy.
-    Also research local government economic development plans and incentives that could
-    attract additional businesses to the area.
+    'job creation {City} {State}', etc. 
+    
+    For each company or development project found, research and include specific details: 
+    company name, industry, planned investment amount, number of jobs expected, 
+    construction/opening timeline, and impact on the local economy. Also research local 
+    government economic development plans and incentives that could attract additional 
+    businesses to the area.
+    
+    Show your detailed reasoning by explaining:
+    1. Why certain companies or industries are choosing this location
+    2. How these developments connect to demographic and population trends
+    3. The potential direct and indirect economic impacts
+    4. The timeline for economic development over the next 5-10 years
+    5. How these trends might specifically benefit the subject property
   expected_output: A comprehensive analysis of growth trends that includes both demographic
     projections AND specific details about companies investing in the region. Your report
     should name individual companies, their expansion plans, job creation numbers, investment
     amounts, timelines, and economic impacts. Include information on government economic
-    development initiatives. This detailed information should be sufficient to allow clients
-    to conduct their own follow-up research on the specific companies and projects mentioned.
+    development initiatives. Your reasoning process should be transparent, showing how you
+    connected specific economic activities to property potential. This detailed information 
+    should be sufficient to allow clients to conduct their own follow-up research on the 
+    specific companies and projects mentioned.
   async_execution: false
   agent: growth_trends_expert
 analyze_housing_occupancy_task:
@@ -67,18 +88,66 @@ analyze_demographics_affordability_task:
     development.
   async_execution: false
   agent: socio_economic_analyst
+analyze_micro_market_task:
+  description: |
+    Use the MicroMarketAnalysisTool to analyze the specific neighborhood surrounding
+    the property at {Property Address}, {City}, {State} within a 1-mile radius. Compare the 
+    subject property to neighboring properties in terms of values, characteristics, 
+    and development potential.
+    
+    Research and analyze:
+    1. Recent sales and listings within the immediate neighborhood
+    2. Price per square foot and value trends specific to this micro-market
+    3. Local amenities within walking distance (0.5 miles) or short drive (1 mile)
+    4. Quality and accessibility of neighborhood infrastructure
+    5. Recent and planned development activity in the immediate vicinity
+    6. Competitive advantages or disadvantages of the subject property relative to its neighbors
+    
+    Show your detailed reasoning by explaining how specific micro-market factors
+    impact the property's value and development potential compared to broader market trends.
+  expected_output: A detailed analysis comparing the subject property to its immediate
+    neighborhood with clear reasoning explaining the property's competitive position 
+    within its micro-market and how hyper-local factors impact its development potential.
+  async_execution: false
+  agent: micro_market_analyst
+analyze_workforce_task:
+  description: |
+    Use the WorkforceAssessmentTool to analyze the workforce characteristics and
+    educational resources in {City}, {State} relevant to property development potential.
+    
+    Research and analyze:
+    1. Major educational institutions and their relevant programs
+    2. Workforce educational attainment levels and skills distribution
+    3. Labor force participation rate and unemployment trends
+    4. Commuting patterns and labor shed information
+    5. Skills alignment with potential development needs
+    6. Workforce development initiatives and training programs
+    
+    Show your detailed reasoning by explaining:
+    1. How the local workforce might support different development scenarios
+    2. Whether educational institutions are producing relevant talent
+    3. How commuting patterns might impact the property's attractiveness
+    4. What workforce trends suggest about future economic opportunities
+    5. Potential workforce-related challenges for development
+  expected_output: A comprehensive analysis of workforce characteristics and educational
+    resources with clear reasoning explaining how human capital factors might impact the
+    property's development potential and economic opportunities.
+  async_execution: false
+  agent: workforce_analyst
 integrate_analysis_task:
-  description: Aggregate and correlate outputs from the 'analyze_property_task', 'analyze_environmental_task',
-    'analyze_growth_trends_task', 'analyze_housing_occupancy_task', and 'analyze_demographics_affordability_task'.
-    Evaluate overall risk and opportunity levels for the property with ID {listing_id}.
-    Develop strategic recommendations that balance market potential with identified
-    risks. Do not summarize or condense the detailed information - especially from the 
-    growth trends analysis. Maintain all company names, economic development plans, and 
-    specific details in your integrated report.
+  description: Aggregate and correlate outputs from ALL previous analyses, including
+    property, environmental, growth trends, occupancy, socio-economic, micro-market,
+    and workforce analyses. Evaluate overall risk and opportunity levels for the property
+    with ID {listing_id}. Develop strategic recommendations that balance market potential
+    with identified risks. Do not summarize or condense the detailed information - especially
+    from the growth trends analysis. Maintain all company names, economic development plans,
+    and specific details in your integrated report. Show the connections between different
+    aspects of the analysis, explaining how they interact to impact overall property potential.
   expected_output: An integrated evaluation report section that provides a unified
     risk and opportunity assessment with clear strategic recommendations for the property.
     This integration should preserve ALL detailed information from the individual analyses,
-    particularly the specific company names and development plans from the growth trends analysis.
+    particularly the specific company names and development plans from the growth trends analysis,
+    while showing how different factors interrelate.
   async_execution: false
   agent: integrated_evaluator
   context:
@@ -87,21 +156,38 @@ integrate_analysis_task:
   - analyze_growth_trends_task
   - analyze_housing_occupancy_task
   - analyze_demographics_affordability_task
+  - analyze_micro_market_task
+  - analyze_workforce_task
 compile_narrative_report_task:
-  description: Compile a final comprehensive narrative report in a professional land
+  description: |
+    Compile a final comprehensive narrative report in a professional land
     analyst style that integrates the findings from the integrated evaluation. The
     report should include an executive summary and detailed sections on Property Analysis,
     Environmental Risk, Growth Trends, Housing Occupancy, Socio-economic Factors,
-    and a concluding recommendations section. The Growth Trends section should be particularly
-    detailed, including specific company names, investment plans, job creation numbers, 
-    timelines, and economic development initiatives. Do not summarize or condense information
-    to keep the report short - include ALL details that would be valuable for further research.
-    The report should be as long as necessary to convey all findings in full detail.
+    Micro-Market Analysis, Workforce Assessment, and a concluding recommendations section.
+    
+    For each section:
+    1. Show your detailed reasoning process using a "Chain of Thought" approach
+    2. Explain how you arrived at each conclusion with supporting evidence
+    3. Highlight connections between different factors and their implications
+    4. Consider alternative interpretations where data permits
+    5. Present both opportunities and challenges in a balanced way
+    
+    The Growth Trends and Environmental Risk sections should be particularly
+    detailed and show extensive reasoning. Include specific company names, investment plans, 
+    job creation numbers, timelines, and economic development initiatives. Explain flood 
+    risk factors thoroughly with mitigation recommendations.
+    
+    Do not summarize or condense information to keep the report short - include ALL details
+    that would be valuable for further research. The report should be as long as necessary
+    to convey all findings in full detail while showing transparent reasoning.
   expected_output: A comprehensive, thorough narrative report that includes ALL analytical
-    findings with complete details. The report should be a research tool that provides
-    actionable intelligence, including specific company names, economic development plans,
-    timelines, and investment details. The report should be as long as needed to include
-    all relevant information without summarizing or condensing important details.
+    findings with complete details and transparent reasoning throughout. The report should
+    be a research tool that provides actionable intelligence, including specific company names, 
+    economic development plans, timelines, investment details, and clear explanations of the
+    reasoning process that led to all conclusions and recommendations. The report should be
+    as long as needed to include all relevant information without summarizing or condensing
+    important details.
   async_execution: false
   agent: narrative_reporter
   context:

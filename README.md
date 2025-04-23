@@ -2,6 +2,31 @@
 
 **Description**: An agentic workflow that conducts comprehensive analysis of land that we are considering for development.
 
+## Quick Start Guide
+
+```bash
+# Clone the repository (if you haven't already)
+git clone https://github.com/yourusername/Soar.git
+cd Soar
+
+# Setup on macOS (recommended)
+./setup.sh
+
+# OR manually set up with venv (all platforms)
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
+pip install -e ".[pdf]"
+
+# Run the evaluation
+./land_eval run  # Or: python main.py run
+```
+
+**Requirements**:
+- Python 3.10 or higher
+- An OpenAI API key added to your `.env` file
+- For PDF generation on macOS: brew with cairo, pango, gdk-pixbuf, libffi
+
 ## How it Works
 
 1. The Soar system will first ask the user to choose a stock number that it would like a report on. Then it will go into the database folder where the master.csv file is located and it will create a folder named "cork" within the database folder. This folder is where all of the csvs that get generated will go.
@@ -44,75 +69,68 @@ The database directory should contain a single file called `master.csv` with the
 
 ## Installation
 
-Ensure you have Python >=3.10 <3.13 installed on your system. There are multiple ways to install this project:
+This project uses Python's virtual environment (venv) for dependency management. Ensure you have Python 3.10+ installed on your system.
 
-### Option 1: Install with pip
+### Option 1: macOS Bash Setup Script (Recommended for macOS)
 
-Basic installation:
+For macOS users, we've created a simple bash script that handles all the setup automatically:
+
 ```bash
+./setup.sh
+```
+
+This script will:
+- Check if you're running macOS
+- Install Homebrew if needed
+- Install Python 3.10+ if needed
+- Install all system dependencies for WeasyPrint (cairo, pango, gdk-pixbuf, libffi)
+- Create necessary symbolic links for WeasyPrint libraries
+- Set up a Python virtual environment (venv)
+- Install all Python dependencies including PDF generation capabilities
+- Create a `./land_eval` executable script for easy access
+
+After running the script, you can use the application with:
+```bash
+# Make sure your virtual environment is activated
+source venv/bin/activate  # This is done automatically by the land_eval script
+
+# Then run the application
+./land_eval run
+```
+
+### Option 2: Manual Setup with Venv (All Platforms)
+
+For all platforms, you can manually set up the project with Python's venv:
+
+```bash
+# Create and activate virtual environment
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install --upgrade pip
 pip install -r requirements.txt
-```
-
-With PDF report generation capabilities:
-```bash
-pip install ".[pdf]"
-```
-
-### Option 2: Install with setup.py
-
-Basic installation:
-```bash
-pip install -e .
-```
-
-With PDF report generation capabilities:
-```bash
-pip install -e ".[pdf]"
-```
-
-Complete installation with all features:
-```bash
-pip install -e ".[full]"
-```
-
-### Option 3: Install with UV
-
-This project uses [UV](https://docs.astral.sh/uv/) for dependency management and package handling, offering a seamless setup and execution experience.
-
-First, if you haven't already, install uv:
-
-```bash
-pip install uv
-```
-
-Next, navigate to your project directory and install the dependencies:
-
-Basic installation:
-```bash
-uv pip install -e .
-```
-
-With PDF report generation capabilities:
-```bash
-uv pip install -e ".[pdf]"
-```
-
-### Option 4: Install with CrewAI CLI
-
-If you have the CrewAI CLI, you can use:
-
-```bash
-crewai install
+pip install -e ".[pdf]"  # Installs optional PDF dependencies
 ```
 
 ### PDF Generation System Dependencies
 
-For PDF report generation, WeasyPrint may require additional system dependencies:
+For PDF report generation, WeasyPrint requires additional system dependencies:
 
 - **On macOS**: 
   ```bash
-  brew install cairo pango libffi
+  brew install cairo pango gdk-pixbuf libffi
   ```
+  
+  You may also need to create symbolic links if you encounter library errors:
+  ```bash
+  cd /usr/local/lib  # or /opt/homebrew/lib on Apple Silicon
+  sudo ln -s libgobject-2.0.dylib libgobject-2.0-0
+  sudo ln -s libpango-1.0.dylib libpango-1.0-0
+  sudo ln -s libpangocairo-1.0.dylib libpangocairo-1.0-0
+  ```
+  
+  Alternatively, just use the `setup.sh` script which handles all this automatically.
 
 - **On Ubuntu/Debian**:
   ```bash
@@ -134,52 +152,26 @@ OPENAI_API_KEY=your_openai_api_key_here
 
 ## Running the Project
 
-To run the project, you have several options depending on how you installed it:
+To run the project, make sure your virtual environment is activated.
 
-### Option 1: Run with Python directly
+### Option 1: Run with the local executable
+
+If you installed using the setup.sh script, you can use:
 
 ```bash
+# This script automatically activates the venv
+./land_eval run
+```
+
+### Option 2: Run with Python directly (in activated venv)
+
+```bash
+# Make sure your virtual environment is activated
+source venv/bin/activate
+
+# Then run the application
 python main.py run
 ```
-
-### Option 2: Run as an installed script
-
-After installing with `pip install -e .`, the main.py script is installed as an executable:
-
-```bash
-main.py run
-```
-
-### Option 3: Run with CrewAI CLI
-
-If you installed with CrewAI CLI:
-
-```bash
-crewai run
-```
-
-### Option 4: Run data processor separately
-
-To only process data without running the crew:
-
-```bash
-process_data
-```
-
-Or:
-
-```bash
-crew_automation
-```
-
-Each command will:
-1. Ask you to select a stock number from the master.csv file
-2. Process the data for that stock number into separate CSV files
-3. Initialize the crew of AI agents
-4. Run the analysis workflow
-5. Generate a comprehensive report
-6. Clean up temporary CSV files
-7. Create a professional report in the `reports` directory (PDF format if dependencies are installed, or markdown otherwise)
 
 ### Available Commands
 
@@ -188,14 +180,12 @@ The following commands are available:
 - `run` - Run the standard workflow
 - `train <iterations> <filename>` - Train the crew for a specified number of iterations
 - `replay <task_id>` - Replay execution from a specific task ID
-- `test <iterations> <model>` - Test the crew with a specific number of iterations and model
 - `help` - Show the help message
 
 Example:
 ```bash
-python main.py run
-python main.py test 1 gpt-4o
-python main.py help
+./land_eval run
+./land_eval help
 ```
 
 ## GitHub Repository
@@ -210,7 +200,7 @@ To set up a new deployment:
 1. Clone the repository
 2. Create a `database` directory and place your `master.csv` file there
 3. Create your `.env` file with your API key
-4. Install dependencies
+4. Run the setup script (or follow the manual installation steps)
 5. Run the project
 
 ## Project Structure
@@ -220,7 +210,8 @@ The project has been structured with the main entry point in the root directory:
 ```
 /
 ├── main.py                  # Main entry point (in root)
-├── setup.py                 # Setup file for installation
+├── setup.sh                 # macOS bash setup script
+├── land_eval                # Local executable script
 ├── requirements.txt         # Package requirements
 ├── .env                     # Environment variables (not in version control)
 ├── .gitignore               # Git ignore file
@@ -233,16 +224,18 @@ The project has been structured with the main entry point in the root directory:
 ├── chroma_vectordb/         # Vector database for agent memory (not in version control)
 ├── reports/                 # Generated PDF reports (not in version control)
 ├── src/                     # Source code
-│   └── crew_automation_evaluation_for_land_listing_opportunities/
+│   └── land_eval/           # Main package directory
 │       ├── __init__.py
 │       ├── crew.py          # Crew definition with GPT-4o model
-│       ├── data_processor.py
+│       ├── data_processor.py # Data processing utilities
 │       ├── config/          # Configuration directory
 │       │   ├── agents.yaml  # Agent definitions
 │       │   └── tasks.yaml   # Task definitions
 │       ├── utils/           # Utility functions
 │       │   └── pdf_generator.py # PDF report generator
 │       └── tools/           # Custom tools
+│           ├── __init__.py
+│           └── research_tool.py # Company/economic research tool
 ```
 
 ## Project Improvements
@@ -263,7 +256,7 @@ This implementation includes several key improvements:
 
 7. **Better Documentation**: Improved inline comments and documentation.
 
-8. **Simplified Setup Process**: Added setup.py and requirements.txt for easy installation.
+8. **Simplified Setup Process**: Added setup.sh and requirements.txt for easy installation.
 
 9. **Hard-coded Model**: Set all agents to use gpt-4o model for consistent performance.
 
@@ -276,6 +269,8 @@ This implementation includes several key improvements:
 13. **Vector Database Management**: Improved management of the vector database to prevent cross-contamination between different property analyses.
 
 14. **PDF Report Generation**: Added automatic PDF report generation with professional formatting for easy sharing with stakeholders.
+
+15. **Virtual Environment Support**: Set up the project to use Python's venv for better dependency management and isolation.
 
 ## Understanding Your Crew
 
@@ -295,7 +290,36 @@ The Soar Crew is composed of multiple AI agents, each with unique roles, goals, 
 
 If you need to customize the project:
 
-- Modify `src/crew_automation_evaluation_for_land_listing_opportunities/config/agents.yaml` to define your agents
-- Modify `src/crew_automation_evaluation_for_land_listing_opportunities/config/tasks.yaml` to define your tasks
-- Modify `src/crew_automation_evaluation_for_land_listing_opportunities/crew.py` to add your own logic, tools and specific args
+- Modify `src/land_eval/config/agents.yaml` to define your agents
+- Modify `src/land_eval/config/tasks.yaml` to define your tasks
+- Modify `src/land_eval/crew.py` to add your own logic, tools and specific args
 - Modify `main.py` to add custom inputs for your agents and tasks
+
+## Recent Improvements
+
+The Land Evaluation report generation system has been enhanced with several new features:
+
+### New Analysis Capabilities
+- **Micro-Market Analysis**: Compares the subject property to properties in the immediate neighborhood (within a 1-mile radius) to provide hyper-local context
+- **Workforce Assessment**: Analyzes local talent pools, educational institutions, and workforce development programs relevant to the property location
+
+### Advanced Reasoning
+- **Chain-of-Thought Prompting**: All agents now show detailed reasoning processes, making conclusions more transparent and defensible
+- **Enhanced Environmental Risk Analysis**: More thorough flood risk assessment with detailed mitigation recommendations
+- **Comprehensive Growth Trends Analysis**: Deeper analysis of economic development with reasoning about why specific companies choose the location
+
+### Technology Upgrades
+- **Claude 3.5 Sonnet LLM**: All agents now use the more powerful Claude 3.5 Sonnet for higher reasoning capabilities and more detailed analysis
+
+## Setup Requirements
+
+Before running the system, make sure to:
+
+1. Set up your environment variables in the `.env` file:
+   - `OPENAI_API_KEY`: Your OpenAI API key (for some supporting functions)
+   - `ANTHROPIC_API_KEY`: Your Anthropic API key (required for Claude 3.5 Sonnet)
+
+2. Install dependencies:
+   ```
+   pip install -r requirements.txt
+   ```

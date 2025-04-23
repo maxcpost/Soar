@@ -7,10 +7,14 @@ import warnings
 from pathlib import Path
 from datetime import datetime
 from dotenv import load_dotenv
+import platform
 
 # Suppress specific deprecation and user warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning, module="paramiko")
 warnings.filterwarnings("ignore", category=UserWarning, module="pydantic")
+# Suppress specific ChromaDB Pydantic deprecation warnings
+warnings.filterwarnings("ignore", message="Accessing the 'model_fields' attribute on the instance is deprecated")
+warnings.filterwarnings("ignore", category=UserWarning, module="chromadb")
 
 # Update imports to use the new module name
 from src.land_eval.crew import CrewAutomationEvaluationForLandListingOpportunitiesCrew
@@ -29,7 +33,7 @@ except ImportError as e:
         def generate_pdf_report(markdown_content, output_path=None, listing_id="unknown"):
             logger.warning("PDF generation module not available. To enable PDF report generation, install with: pip install -e .[pdf]")
             print("\nPDF generation module is not available. To enable this feature, install the required dependencies:")
-            print("pip install -e .[pdf]")
+            print("pip install -e \".[pdf]\"")
             
             # Create a fallback markdown file
             from pathlib import Path
@@ -75,13 +79,22 @@ if env_path.exists():
     load_dotenv(dotenv_path=env_path)
     logger.info("Loaded environment variables from .env file")
 else:
-    logger.warning("No .env file found. Make sure to set OPENAI_API_KEY environment variable.")
+    logger.warning("No .env file found. Make sure to set API keys as environment variables.")
 
-# Check if OpenAI API key is set
-if not os.getenv("OPENAI_API_KEY"):
-    logger.warning("OPENAI_API_KEY is not set. Crew might not function correctly.")
+# Check if required API keys are set
+openai_key = os.getenv("OPENAI_API_KEY")
+anthropic_key = os.getenv("ANTHROPIC_API_KEY")
+
+if not openai_key:
+    logger.warning("OPENAI_API_KEY is not set. Some functions might not work correctly.")
     print("\n⚠️  WARNING: OPENAI_API_KEY environment variable is not set!")
     print("Please set it in the .env file or as an environment variable.")
+
+if not anthropic_key or anthropic_key == "YOUR_ANTHROPIC_API_KEY_HERE":
+    logger.warning("ANTHROPIC_API_KEY is not set or is using the placeholder value. Claude models will not function correctly.")
+    print("\n⚠️  WARNING: ANTHROPIC_API_KEY environment variable is not set or is using the placeholder value!")
+    print("Please add your Anthropic API key to the .env file to use Claude 3.5 Sonnet.")
+    print("The system will continue but may encounter errors when trying to use Claude models.")
 
 def cleanup_cork_folder(cork_path):
     """
@@ -450,7 +463,10 @@ def show_help():
     print("Note: Reports are automatically generated in the './reports' directory")
     if not PDF_GENERATION_AVAILABLE:
         print("\nPDF generation is currently disabled. To enable this feature, install the required dependencies:")
-        print("pip install -e .[pdf]")
+        print("pip install -e \".[pdf]\"")
+        if platform.system() == "Darwin":  # macOS specific instructions
+            print("\nFor macOS, also install the required system dependencies:")
+            print("brew install cairo pango gdk-pixbuf libffi")
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:

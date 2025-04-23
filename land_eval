@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Wrapper script for Land Eval
+
+# Path to the project directory
+PROJECT_DIR="/Users/maximillianpost/Documents/Garden/Projects/ADLA/Soar"
+
+# Activate the virtual environment and run the command
+source "$PROJECT_DIR/venv/bin/activate"
+python "$PROJECT_DIR/main.py" "$@"
+

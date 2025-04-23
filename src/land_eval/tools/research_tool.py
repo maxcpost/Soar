@@ -3,7 +3,7 @@ Enhanced research tools for Land Eval agents to gather detailed information.
 """
 
 from crewai.tools import BaseTool
-from langchain.utilities import GoogleSearchAPIWrapper
+from langchain_community.utilities import GoogleSearchAPIWrapper
 from typing import Type
 from pydantic import BaseModel, Field
 

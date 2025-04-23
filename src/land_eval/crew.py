@@ -1,5 +1,6 @@
 import warnings
 import logging
+import os
 # Suppress specific warnings that might come from dependencies
 warnings.filterwarnings("ignore", category=DeprecationWarning, module="paramiko")
 warnings.filterwarnings("ignore", category=UserWarning, module="pydantic")
@@ -9,11 +10,30 @@ from crewai.project import CrewBase, agent, crew, task
 from crewai_tools import CSVSearchTool
 from crewai_tools import WebsiteSearchTool
 
-# Import the custom research tool
+# Import the custom tools
 from src.land_eval.tools import EconomicGrowthResearchTool
+from src.land_eval.tools import WorkforceAssessmentTool
+from src.land_eval.tools import MicroMarketAnalysisTool
 
 # Set up logger
 logger = logging.getLogger(__name__)
+
+# Define LLM selection logic
+def get_llm_model():
+    """
+    Determine which LLM to use based on available API keys.
+    Prefers Claude 3.5 Sonnet but falls back to GPT-4o if Anthropic key is not available.
+    """
+    anthropic_key = os.getenv("ANTHROPIC_API_KEY")
+    if anthropic_key and anthropic_key != "YOUR_ANTHROPIC_API_KEY_HERE":
+        logger.info("Using Claude 3.5 Sonnet for enhanced reasoning capabilities")
+        return "anthropic/claude-3-5-sonnet-20240620"
+    else:
+        logger.warning("Anthropic API key not available or invalid. Falling back to GPT-4o")
+        return "gpt-4o"
+
+# Get the LLM model to use across all agents
+SELECTED_LLM = get_llm_model()
 
 @CrewBase
 class CrewAutomationEvaluationForLandListingOpportunitiesCrew():
@@ -24,7 +44,7 @@ class CrewAutomationEvaluationForLandListingOpportunitiesCrew():
         return Agent(
             config=self.agents_config['property_analyst'],
             tools=[CSVSearchTool(), WebsiteSearchTool()],
-            llm="gpt-4o",
+            llm=SELECTED_LLM,
         )
 
     @agent
@@ -32,7 +52,7 @@ class CrewAutomationEvaluationForLandListingOpportunitiesCrew():
         return Agent(
             config=self.agents_config['environmental_evaluator'],
             tools=[CSVSearchTool(), WebsiteSearchTool()],
-            llm="gpt-4o",
+            llm=SELECTED_LLM,
         )
 
     @agent
@@ -40,7 +60,7 @@ class CrewAutomationEvaluationForLandListingOpportunitiesCrew():
         return Agent(
             config=self.agents_config['growth_trends_expert'],
             tools=[CSVSearchTool(), WebsiteSearchTool(), EconomicGrowthResearchTool()],
-            llm="gpt-4o",
+            llm=SELECTED_LLM,
         )
 
     @agent
@@ -48,7 +68,7 @@ class CrewAutomationEvaluationForLandListingOpportunitiesCrew():
         return Agent(
             config=self.agents_config['occupancy_expert'],
             tools=[CSVSearchTool(), WebsiteSearchTool()],
-            llm="gpt-4o",
+            llm=SELECTED_LLM,
         )
 
     @agent
@@ -56,7 +76,23 @@ class CrewAutomationEvaluationForLandListingOpportunitiesCrew():
         return Agent(
             config=self.agents_config['socio_economic_analyst'],
             tools=[CSVSearchTool(), WebsiteSearchTool()],
-            llm="gpt-4o",
+            llm=SELECTED_LLM,
+        )
+
+    @agent
+    def micro_market_analyst(self) -> Agent:
+        return Agent(
+            config=self.agents_config['micro_market_analyst'],
+            tools=[CSVSearchTool(), WebsiteSearchTool(), MicroMarketAnalysisTool()],
+            llm=SELECTED_LLM,
+        )
+
+    @agent
+    def workforce_analyst(self) -> Agent:
+        return Agent(
+            config=self.agents_config['workforce_analyst'],
+            tools=[CSVSearchTool(), WebsiteSearchTool(), WorkforceAssessmentTool()],
+            llm=SELECTED_LLM,
         )
 
     @agent
@@ -64,7 +100,7 @@ class CrewAutomationEvaluationForLandListingOpportunitiesCrew():
         return Agent(
             config=self.agents_config['integrated_evaluator'],
             tools=[],
-            llm="gpt-4o",
+            llm=SELECTED_LLM,
         )
 
     @agent
@@ -72,7 +108,7 @@ class CrewAutomationEvaluationForLandListingOpportunitiesCrew():
         return Agent(
             config=self.agents_config['narrative_reporter'],
             tools=[],
-            llm="gpt-4o",
+            llm=SELECTED_LLM,
         )
 
 
@@ -109,6 +145,20 @@ class CrewAutomationEvaluationForLandListingOpportunitiesCrew():
         return Task(
             config=self.tasks_config['analyze_demographics_affordability_task'],
             tools=[CSVSearchTool(), WebsiteSearchTool()],
+        )
+
+    @task
+    def analyze_micro_market_task(self) -> Task:
+        return Task(
+            config=self.tasks_config['analyze_micro_market_task'],
+            tools=[CSVSearchTool(), WebsiteSearchTool(), MicroMarketAnalysisTool()],
+        )
+
+    @task
+    def analyze_workforce_task(self) -> Task:
+        return Task(
+            config=self.tasks_config['analyze_workforce_task'],
+            tools=[CSVSearchTool(), WebsiteSearchTool(), WorkforceAssessmentTool()],
         )
 
     @task

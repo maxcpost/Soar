@@ -7,7 +7,11 @@ All agents have access to built-in web search capabilities for detailed research
 """
 
 from src.land_eval.tools.research_tool import EconomicGrowthResearchTool
+from src.land_eval.tools.workforce_tool import WorkforceAssessmentTool
+from src.land_eval.tools.micro_market_tool import MicroMarketAnalysisTool
 
 __all__ = [
     "EconomicGrowthResearchTool",
+    "WorkforceAssessmentTool",
+    "MicroMarketAnalysisTool",
 ]
